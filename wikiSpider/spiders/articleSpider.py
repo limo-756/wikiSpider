@@ -1,20 +1,33 @@
+from scrapy.extensions.closespider import CloseSpider
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
+from wikiSpider.items import Article
+import time
+
+count = 0
 
 
 def parse_items(response, is_article):
     print(response.url)
     title = response.css('h1::text').get()
+    global count
+    print("Count is ", count)
+    if count == 5:
+        raise CloseSpider('bandwidth_exceeded')
+
     if is_article:
         url = response.url
         text = response.xpath('//div[@id="mw-content-text//text()"]').getall()
         last_updated = response.css('li#footer-info-lastmod::text').get()
         last_updated = last_updated.replace('This page was last edited on ', '')
-        print('Title is: {} '.format(title))
-        print('text is: {} '.format(text))
-        print('last_updated is: {}'.format(last_updated))
-    else:
-        print('This is not an article: {}'.format(title))
+        article = Article()
+        article['url'] = url
+        article['text'] = text
+        article['last_updated'] = last_updated
+        article['title'] = title
+
+    count += 1
+    time.sleep(1)
 
 
 class ArticlesSpider(CrawlSpider):

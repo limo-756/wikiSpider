@@ -6,7 +6,9 @@
 import scrapy
 
 
-class WikispiderItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
+class Article(scrapy.Item):
+    url = scrapy.Field()
+    title = scrapy.Field()
+    text = scrapy.Field()
+    last_updated = scrapy.Field()
     pass
